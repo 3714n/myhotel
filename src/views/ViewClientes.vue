@@ -59,7 +59,7 @@
         <v-dialog v-model="dialog" max-width="500">
             <v-card>
                 <v-card-title>
-                    {{ selectedReserva ? "Editar Cliente" : "Nuevo Cliente" }}
+                    {{ selectedCliente? "Editar Cliente" : "Nuevo Cliente" }}
                 </v-card-title>
                 <v-card-text>
                     <!-- Formulario para crear/Editar la reserva -->

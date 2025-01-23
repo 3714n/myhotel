@@ -37,7 +37,7 @@
                                     <td class="text-center">{{ cuenta.TotalesGeneral[0].cantidadPersonas }}</td>
                                     <td class="text-center">{{ cuenta.TotalesGeneral[0].total }}</td>
                                     <td>
-                                        <v-btn class="text-none" color="primary" small @click="AgregarPago(cuenta.clientes[0].n_i)">
+                                        <v-btn class="text-none" color="primary" small @click="AgregarPago(cuenta.id)">
                                             Nuevo pago
                                         </v-btn>
                                         <v-btn class="text-none" color="red" small @click="CerrarCuenta(cuenta.id)">
@@ -61,8 +61,8 @@
                     <nuevoServ @cerrar-dialogo="dialog = false" />
                     {{  fetchCuentas() }}
                 </v-dialog>
-                <v-dialog v-model="dialog1" :n_i="numero_Identidad" max-width="1000">
-                    <nuevoPago @cerrar-dialogo="dialog = false" />
+                <v-dialog v-model="dialog1"  max-width="1000">
+                    <nuevoPago :clienteFormHijo="clienteFormPadre" @cerrar-dialogo="dialog = false" />
                     {{  fetchCuentas() }}
                 </v-dialog>
 
@@ -84,15 +84,19 @@
                 dialog1: false,
                 dialog: false,
                 selectedcuentas: null,
-                numero_Identidad:null,
-
+                clienteSeleccionado: null,
+                clienteFormPadre:{
+                    n_i:"",
+                    name:"",
+                    apellido:"",
+                    
+                },
 
             };
         },
         async created() {
             await this.fetchCuentas();
-
-
+           
         },
         methods: {
 
@@ -102,31 +106,26 @@
 
                     // Construimos `Cuentas` como un array de subarrays
                     this.Cuentas = BusquedaSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), }));
-
-
-
-                    console.log("Datos Traídos:", this.Cuentas);
-
                 } catch (error) {
                     console.error("Error al cargar las cuentas:", error);
                 }
             },
 
-
-
-
             Nueva_cuenta() {
                 
                 this.dialog = true;
                 this.fetchCuentas();
+                
             },
 
-            AgregarPago(n_i) {
-                this.numero_Identidad = n_i; // Guardar el n_i del cliente seleccionado
-
+            AgregarPago(id) {
+                const ClienteDatos = this.Cuentas.find((h) => h.id === id);
+                this.clienteFormPadre = {...ClienteDatos.clientes[0]}
                 this.dialog1 = true;
                 this.fetchCuentas();
-
+                console.log("numero de identidad: " + this.clienteFormPadre.n_i);
+                console.log("numero de identidad: " + this.clienteFormPadre.name);
+                console.log("numero de identidad: " + this.clienteFormPadre.apellido);
             },
             async CerrarCuenta(id) {
                 await deleteDoc(doc(db, "cuenta", id));
