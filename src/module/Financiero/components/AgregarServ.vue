@@ -143,15 +143,13 @@ export default {
             // Obtener la colección "clientes" desde Firestore
             try {
                 const snapshot = await getDocs(collection(db, "Cliente"));
-                const QuerySnapshot = await getDocs (collection(db,"habitacion"))
+                const QuerySnapshot = await getDocs(collection(db, "habitacion"))
                 this.clientes = snapshot.docs.map((doc) => ({
                     id: doc.id,
                     ...doc.data(),
                 }));
-                this.habitacion = QuerySnapshot.docs.map(doc =>({id:doc.id, ...doc.data(), Cantidad: 0,}))
-                console.log("Clientes cargados:", this.clientes); // Log para verificar los datos
-                console.log("habitaciones cargadas: ", this.habitacion);
-                console.log("Habitaciones cargadas: ", this.habitacion);
+                this.habitacion = QuerySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), Cantidad: 0, }))
+
             } catch (error) {
                 console.error("Error al cargar clientes:", error);
             }
@@ -196,9 +194,7 @@ export default {
                 };
 
                 this.nuevaOrden.TotalesGeneral.push(Totales);
-                console.log("cantidad: " + this.nuevaOrden.total);
-                console.log("cantidad: " + this.nuevaOrden.CantidadPersonas);
-                console.log("cantidad: " + this.nuevaOrden.TotalesGeneral);
+                
                 const nuevaCuenta = {
                     fecha: this.cuentaForm.Fecha_Apertura,
                     habitaciones: this.nuevaOrden.habitaciones,
@@ -206,11 +202,7 @@ export default {
                     TotalesGeneral: this.nuevaOrden.TotalesGeneral,        
                  };
                 await addDoc(collection(db, "cuentas"), nuevaCuenta);
-                alert("Cuenta guardada exitosamente");
-                
-                console.log("esta son las cuentas " + this.cuentaForm.Fecha_Apertura)
-                console.log("esta son las cuentas " + this.nuevaOrden.habitaciones)
-                
+                alert("Cuenta guardada exitosamente");               
                 this.cancel();
             } catch (error) {
                 console.error("Error al guardar la cuenta:", error);

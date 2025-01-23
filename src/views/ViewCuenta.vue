@@ -37,7 +37,7 @@
                                     <td class="text-center">{{ cuenta.TotalesGeneral[0].cantidadPersonas }}</td>
                                     <td class="text-center">{{ cuenta.TotalesGeneral[0].total }}</td>
                                     <td>
-                                        <v-btn class="text-none" color="primary" small @click="AgregarPago(cuenta.id)">
+                                        <v-btn class="text-none" color="primary" small @click="AgregarPago(cuenta.clientes[0].n_i)">
                                             Nuevo pago
                                         </v-btn>
                                         <v-btn class="text-none" color="red" small @click="CerrarCuenta(cuenta.id)">
@@ -58,11 +58,11 @@
                 </v-row>
 
                 <v-dialog v-model="dialog" max-width="1000">
-                    <NuevoPago @cerrar-dialogo="dialog = false" />
+                    <nuevoServ @cerrar-dialogo="dialog = false" />
                     {{  fetchCuentas() }}
                 </v-dialog>
-                <v-dialog v-model="dialog" max-width="1000">
-                    <nuevoServ @cerrar-dialogo="dialog = false" />
+                <v-dialog v-model="dialog1" :n_i="numero_Identidad" max-width="1000">
+                    <nuevoPago @cerrar-dialogo="dialog = false" />
                     {{  fetchCuentas() }}
                 </v-dialog>
 
@@ -72,15 +72,19 @@
     import { db } from "@/FireBaseConfig";
     import { collection, getDocs, doc, deleteDoc } from "firebase/firestore";
     import nuevoServ from '../module/Financiero/components/AgregarServ.vue';
+    import nuevoPago from '../module/Financiero/components/AgregarPagos.vue';
     export default {
         components: {
             nuevoServ,
+            nuevoPago,
         },
         data() {
             return {
                 Cuentas: [],
+                dialog1: false,
                 dialog: false,
                 selectedcuentas: null,
+                numero_Identidad:null,
 
 
             };
@@ -112,14 +116,16 @@
 
 
             Nueva_cuenta() {
+                
                 this.dialog = true;
                 this.fetchCuentas();
             },
 
-            AgregarPago(id) {
-                const cuenta = this.datosTraidos.find((h) => h.id === id)
-                this.Servicos = { ...cuenta }
-                this.selectedcuentas = id;
+            AgregarPago(n_i) {
+                this.numero_Identidad = n_i; // Guardar el n_i del cliente seleccionado
+
+                this.dialog1 = true;
+                this.fetchCuentas();
 
             },
             async CerrarCuenta(id) {
