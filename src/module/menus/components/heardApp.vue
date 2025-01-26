@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-app-bar>
-      <v-app-bar-title class="my-custom-title">Application Bar</v-app-bar-title>
+      <v-app-bar-title class="my-custom-title">My Hotel</v-app-bar-title>
 
       <template v-slot:append>
         <v-btn icon="mdi-heart"></v-btn>

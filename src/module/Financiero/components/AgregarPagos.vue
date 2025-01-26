@@ -59,7 +59,7 @@
 
             <v-row>
                 <v-col>
-                    <v-table height="1000px" fixed-header>
+                    <v-table height="300px" fixed-header>
                         <thead>
                             <tr>
                                 <th class="text-center">Fecha</th>
@@ -85,8 +85,18 @@
                     </v-table>
                 </v-col>
             </v-row>
-
-            <p><strong>Total de pagos: ${{ totalPagado }}</strong></p>
+            <v-row>
+                <v-col >
+                    <p><strong>Total de pagos: ${{ totalPagado }}</strong></p>
+                </v-col>
+                <v-col >
+                    <p><strong>Total de Deuda: ${{ totalDeuda }}</strong></p>
+                </v-col>
+                <v-col >
+                    <p><strong>Diferencia: ${{ diferencia }}</strong></p>
+                </v-col>
+            </v-row>
+           
             <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn text @click="cancel">Cancelar</v-btn>
@@ -112,6 +122,9 @@ export default {
     data() {
         return {
             pagos: [],
+            servicio_Totales: [],
+            totalDeuda:0,
+            diferencia:0,
             totalPagado: 0,
             PagosForm: {
                 fechaPago: "",
@@ -131,18 +144,24 @@ export default {
 
     async created() {
         // Buscamos el cliente automáticamente al cargar el componente
-        await this.FecthPago();
+        await this.FetchPago();
     },
 
     methods: {
-        async FecthPago() {
+        async FetchPago() {
             try {
                 const snapshot = await getDocs(collection(db, "pagos"));
                 this.pagos = snapshot.docs.map((doc) => ({
                     id: doc.id,
                     ...doc.data(),
                 }));
+                const snapshotServicio = await getDocs(collection(db, "cuentas"));
+                this.servicio_Totales = snapshotServicio.docs.map((doc) => ({
+                    id: doc.id,
+                    ...doc.data(),
+                }));
                 this.Calcular_Pago_Totales();
+                console.log(this.servicio_Totales);
             } catch (error) {
                 console.error("Error al cargar pagos:", error);
             }
@@ -157,17 +176,31 @@ export default {
                 const nuevo_Pago = {
                     numero_Identidad: this.nuemero_Identidad_Props,
                     ...this.PagosForm,
+                    totalDeuda: this.totalDeuda,
+                    totalPagado: this.totalPagado0,
+                    diferencia:this.diferencia,
                 };
                 await addDoc(collection(db, "pagos"), nuevo_Pago);
                 alert("Pago guardado exitosamente.");
-                await this.FecthPago();
+                await this.FetchPago();
             } catch (error) {
                 alert("Error al guardar el pago:", error);
             }
         },
 
         Calcular_Pago_Totales() {
-            this.totalPagado = this.pagos.reduce((acc, pago) => acc + pago.valorPago, 0);
+
+            const PagosAgregados = this.pagos.reduce((acc, pago) => acc + Number(pago.valorPago), 0);
+            const TotalServicio = Number(this.servicio_Totales.reduce(
+                (acc, servicio) => acc + servicio.TotalesGeneral[0]?.total || 0,
+                0
+            ));
+            this.totalPagado = PagosAgregados;
+            this.totalDeuda = TotalServicio;
+            this.diferencia = Number(TotalServicio - PagosAgregados);
+            console.log("Valor del pago: " + PagosAgregados);
+            console.log("Valor del servicio: " + TotalServicio);
+
         },
 
         

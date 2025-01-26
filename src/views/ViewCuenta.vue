@@ -17,7 +17,9 @@
                                     <th class="text-center">Habitaciones</th>
                                     <th class="text-center">Fecha Apertura</th>
                                     <th class="text-center">Cantidad Personas</th>
-                                    <th class="text-center">Valor a pagar</th>
+                                    <th class="text-center">Pagar</th>
+                                    <th class="text-center">Pagó</th>
+                                    <th class="text-center">Diferencia</th>
                                     <th class="text-center">Acción</th>
                                 </tr>
                             </thead>
@@ -36,6 +38,10 @@
                                     <td class="text-center">{{ cuenta.fecha }}</td>
                                     <td class="text-center">{{ cuenta.TotalesGeneral[0].cantidadPersonas }}</td>
                                     <td class="text-center">{{ cuenta.TotalesGeneral[0].total }}</td>
+                                    <td class="text-center" v-for="totales in pagos" :key="totales.id">
+                                    {{ totales.totalDeuda }}</td>
+                                    <td class="text-center" v-for="totales in pagos" :key="totales.id">
+                                        {{ totales.diferencia }}</td>
                                     <td>
                                         <v-btn class="text-none" color="primary" small @click="AgregarPago(cuenta.id)">
                                             Nuevo pago
@@ -123,12 +129,10 @@
                 this.clienteFormPadre = {...ClienteDatos.clientes[0]}
                 this.dialog1 = true;
                 this.fetchCuentas();
-                console.log("numero de identidad: " + this.clienteFormPadre.n_i);
-                console.log("numero de identidad: " + this.clienteFormPadre.name);
-                console.log("numero de identidad: " + this.clienteFormPadre.apellido);
+
             },
             async CerrarCuenta(id) {
-                await deleteDoc(doc(db, "cuenta", id));
+                await deleteDoc(doc(db, "cuentas", id));
                 await this.fetchCuentas();
             },
 
